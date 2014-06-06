@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Calculator</title>
+      <link rel="stylesheet" href="calculator.css" type="text/css" />
+      <script type="text/javascript">
+        // 'use strict;'
+      var calculatorState = {
+          currentValue: '',
+          previousValue: '',
+          pendingOperation: '',
+          displaySize: 22,
+          decimalExists: false
+      };
+
+      function leftPadDisplay(displayString) {
+        var padding = "";
+        var blnkSpace = " ";
+        var displayPos = calculatorState.displaySize - displayString.length;
+        for (var i=0; i<displayPos; i++) {
+          padding += blnkSpace;
+        };
+        console.log("-->"+padding+"<--");
+        var j = 0;
+        if(padding.length) {
+          for (var i=padding.length; i<calculatorState.displaySize; i++) {
+            padding += displayString.charAt(j);
+            j++;
+          };
+        }
+        console.log(padding);
+        return padding;
+      }
+
+      function showDisplay(displayString) {
+         display.value = leftPadDisplay(displayString);
+      };
+
+      window.calculatorApp = {
+          clickDigit: function (digit) {
+            if((digit != 0) || calculatorState.currentValue) {
+              calculatorState.currentValue += digit;
+            }
+            console.log("currentValue "+calculatorState.currentValue);
+            showDisplay(calculatorState.currentValue);
+          },
+          clickDecimal: function () {
+            if( !calculatorState.decimalExists ) {
+              this.clickDigit(".")
+              calculatorState.decimalExists = true;
+            }
+          },
+          clickOperation: function (op) {
+            console.log("Operation: "+op+"  ");
+            if (calculatorState.pendingOperation) {
+              console.log("Pending: "+op+"  ");
+              this.clickEquals();
+            }
+            
+            calculatorState.previousValue = calculatorState.currentValue;
+
+            calculatorState.pendingOperation = op;
+            calculatorState.currentValue = "";
+            showDisplay(calculatorState.currentValue);
+          },
+          clickClear: function() {
+            calculatorState.currentValue = "";
+            calculatorState.previousValue = "";
+            calculatorState.pendingOperation = '';
+            calculatorState.displaySize = 22;
+            calculatorState.decimalExists = false;
+            showDisplay(calculatorState.currentValue);
+          },
+          clickClearEntry: function() {
+            calculatorState.currentValue = "";
+            showDisplay(calculatorState.currentValue);
+          },
+          clickEquals: function () {
+            console.log("Pending: "+calculatorState.pendingOperation+"  ");
+            if (calculatorState.pendingOperation) {
+              console.log("doPending: "+calculatorState.pendingOperation+"  ");
+              var curr = parseFloat(calculatorState.currentValue);
+              var prev = parseFloat(calculatorState.previousValue);
+              var result = 0.0;
+              console.log("prev: "+prev+"  curr "+curr);
+              if(calculatorState.pendingOperation === '+') result = prev + curr;
+              else if(calculatorState.pendingOperation === '-') result = prev - curr;
+              else if(calculatorState.pendingOperation === '*') result = prev * curr;
+              else if(calculatorState.pendingOperation === '/') {
+                if(curr !== 0.0) {
+                    result = prev / curr;
+                  }
+                  else {
+                    result = NaN;
+                  }
+              }
+              calculatorState.previousValue = result.toString();
+              calculatorState.currentValue = result.toString();
+              console.log("opResult: "+calculatorState.previousValue);
+              calculatorState.pendingOperation = "";
+            }
+            showDisplay(calculatorState.currentValue);
+          },
+          clickChangeSign: function () {
+            var curr = parseFloat(calculatorState.currentValue);
+            curr *= -1.0;
+            calculatorState.currentValue = curr.toString();
+            showDisplay(calculatorState.currentValue);
+          }
+      };   
+      </script>
+   </head>
+   <body>
+      <div>
+        <h1>Berta's Calculator</h1>
+      </div>
+      <div id="calculatorBody">
+         <div id="displaySection">
+            <input type="text" id="display" value="                        " size="25" />
+         </div>
+         <div id="buttonRow1" class="buttonRow">
+            <ul>
+               <li><input id"buttonC" type="button" class="button" value="C" onclick="calculatorApp.clickClear()"/></li>
+               <li><input id"buttonCE" type="button" class="button" value="CE" onclick="calculatorApp.clickClearEntry()"/></li>
+               <li><input id"buttonSIGN" type="button" class="button" value="+/-" onclick="calculatorApp.clickChangeSign()"/></li>
+               <li><input id"buttonPWR" type="button" class="pwrButton" value="PWR" onclick="calculatorApp.clickPwrOnOff()"/></li>
+            </ul>
+         </div>
+         <div id="buttonRow2" class="buttonRow">
+            <ul>
+               <li><input id"button7" type="button" class="button" value="7" onclick="calculatorApp.clickDigit(7)"/></li>
+               <li><input id"button8" type="button" class="button" value="8" onclick="calculatorApp.clickDigit(8)"/></li>
+               <li><input id"button9" type="button" class="button" value="9" onclick="calculatorApp.clickDigit(9)"/></li>
+               <li><input id"buttonMult" type="button" class="button" value="*" onclick="calculatorApp.clickOperation('*')"/></li>
+            </ul>
+         </div>
+         <div id="buttonRow3" class="buttonRow">
+            <ul>
+               <li><input id"button4" type="button" class="button" value="4" onclick="calculatorApp.clickDigit(4)"/></li>
+               <li><input id"button5" type="button" class="button" value="5" onclick="calculatorApp.clickDigit(5)"/></li>
+               <li><input id"button6" type="button" class="button" value="6" onclick="calculatorApp.clickDigit(6)"/></li>
+               <li><input id"buttonDiv" type="button" class="button" value="/" onclick="calculatorApp.clickOperation('/')"/></li>
+            </ul>
+         </div>
+         <div id="buttonRow4" class="buttonRow">
+            <ul>
+               <li><input id"button1" type="button" class="button" value="1" onclick="calculatorApp.clickDigit(1)"/></li>
+               <li><input id"button2" type="button" class="button" value="2" onclick="calculatorApp.clickDigit(2)"/></li>
+               <li><input id"button3" type="button" class="button" value="3" onclick="calculatorApp.clickDigit(3)"/></li>
+               <li><input id"buttonAdd" type="button" class="button" value="+" onclick="calculatorApp.clickOperation('+')"/></li>
+            </ul>
+         </div>
+         <div id="buttonRow5" class="buttonRow">
+            <ul>
+               <li><input id"button0" type="button" class="button" value="0" onclick="calculatorApp.clickDigit(0)"/></li>
+               <li><input id"buttonDOT" type="button" class="button" value="." onclick="calculatorApp.clickDecimal()"/></li>
+               <li><input id"buttonEqulas" type="button" class="button" value="=" onclick="calculatorApp.clickEquals()"/></li>
+               <li><input id"buttonSub" type="button" class="button" value="-" onclick="calculatorApp.clickOperation('-')"/></li>
+            </ul>
+         </div>
+      </div>
+   </body>
+</html>
